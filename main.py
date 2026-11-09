@@ -1,24 +1,55 @@
 # База данных для хранения записей автосервиса
-# Каждая запись: {"time": "ЧЧ:ММ", "name": "Имя", "car": "Марка"}
 appointments = []
 
 def get_free_time():
     print("\n--- Доступные слоты для записи ---")
-    # Генерируем рабочие часы с 9:00 до 18:00
     all_slots = [f"{hour}:00" for hour in range(9, 19)]
-    
-    # Находим слоты, которые уже заняты
     booked_slots = [app["time"] for app in appointments]
-    
-    # Выводим только свободные слоты
     has_free = False
     for slot in all_slots:
         if slot not in booked_slots:
             print(f"[ ] {slot}")
             has_free = True
-            
     if not has_free:
         print("К сожалению, все слоты на сегодня заняты.")
+
+def add_appointment():
+    print("\n--- Запись нового клиента ---")
+    time_input = input("Введите время (например, 14:00): ").strip()
+    
+    # Проверка корректности формата времени
+    all_slots = [f"{hour}:00" for hour in range(9, 19)]
+    if time_input not in all_slots:
+        print("Ошибка: Автосервис работает с 9:00 до 18:00. Вводите время в формате ЧЧ:00.")
+        return
+        
+    # Проверка, не занято ли время
+    for app in appointments:
+        if app["time"] == time_input:
+            print("Ошибка: Это время уже занято другим клиентом!")
+            return
+            
+    name = input("Введите имя клиента: ").strip()
+    car = input("Введите марку автомобиля: ").strip()
+    
+    if not name or not car:
+        print("Ошибка: Имя и марка машины не могут быть пустыми!")
+        return
+        
+    # Добавляем запись в базу данных
+    appointments.append({"time": time_input, "name": name, "car": car})
+    print(f"Успешно! Клиент {name} на машине {car} записан на {time_input}.")
+
+def show_all_appointments():
+    print("\n--- Список всех записей на день ---")
+    if not appointments:
+        print("На сегодня записей нет.")
+        return
+    
+    # Сортируем записи по времени для красоты
+    sorted_apps = sorted(appointments, key=lambda x: x["time"])
+    for app in sorted_apps:
+        print(f"[{app['time']}] Клиент: {app['name']}, Авто: {app['car']}")
 
 def main():
     while True:
@@ -35,9 +66,9 @@ def main():
         if choice == "1":
             get_free_time()
         elif choice == "2":
-            print("Выбран пункт: Записать клиента (Функция в разработке)")
+            add_appointment()
         elif choice == "3":
-            print("Выбран пункт: Список всех записей на день (Функция в разработке)")
+            show_all_appointments()
         elif choice == "4":
             print("Выбран пункт: Отменить запись (Функция в разработке)")
         elif choice == "5":
