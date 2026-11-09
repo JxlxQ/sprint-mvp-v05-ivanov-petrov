@@ -17,13 +17,11 @@ def add_appointment():
     print("\n--- Запись нового клиента ---")
     time_input = input("Введите время (например, 14:00): ").strip()
     
-    # Проверка корректности формата времени
     all_slots = [f"{hour}:00" for hour in range(9, 19)]
     if time_input not in all_slots:
         print("Ошибка: Автосервис работает с 9:00 до 18:00. Вводите время в формате ЧЧ:00.")
         return
         
-    # Проверка, не занято ли время
     for app in appointments:
         if app["time"] == time_input:
             print("Ошибка: Это время уже занято другим клиентом!")
@@ -36,7 +34,6 @@ def add_appointment():
         print("Ошибка: Имя и марка машины не могут быть пустыми!")
         return
         
-    # Добавляем запись в базу данных
     appointments.append({"time": time_input, "name": name, "car": car})
     print(f"Успешно! Клиент {name} на машине {car} записан на {time_input}.")
 
@@ -46,10 +43,38 @@ def show_all_appointments():
         print("На сегодня записей нет.")
         return
     
-    # Сортируем записи по времени для красоты
     sorted_apps = sorted(appointments, key=lambda x: x["time"])
     for app in sorted_apps:
         print(f"[{app['time']}] Клиент: {app['name']}, Авто: {app['car']}")
+
+def cancel_appointment():
+    print("\n--- Отмена записи ---")
+    name_input = input("Введите имя клиента для отмены записи: ").strip()
+    
+    found_apps = [app for app in appointments if app["name"].lower() == name_input.lower()]
+    
+    if not found_apps:
+        print(f"Записей на имя {name_input} не найдено.")
+        return
+        
+    # Удаляем найденные записи
+    global appointments
+    appointments = [app for app in appointments if app["name"].lower() != name_input.lower()]
+    print(f"Успешно! Все записи для клиента {name_input} были отменены.")
+
+def search_appointment_by_name():
+    print("\n--- Поиск записи по имени ---")
+    name_input = input("Введите имя клиента для поиска: ").strip()
+    
+    found_apps = [app for app in appointments if app["name"].lower() == name_input.lower()]
+    
+    if not found_apps:
+        print(f"Записей для клиента {name_input} не найдено.")
+        return
+        
+    print(f"Найдено записей: {len(found_apps)}")
+    for app in found_apps:
+        print(f"[{app['time']}] Автомобиль: {app['car']}")
 
 def main():
     while True:
@@ -70,9 +95,9 @@ def main():
         elif choice == "3":
             show_all_appointments()
         elif choice == "4":
-            print("Выбран пункт: Отменить запись (Функция в разработке)")
+            cancel_appointment()
         elif choice == "5":
-            print("Выбран пункт: Поиск записи по имени (Функция в разработке)")
+            search_appointment_by_name()
         elif choice == "0":
             print("Программа завершена. До свидания!")
             break
